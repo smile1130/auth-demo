@@ -2,9 +2,9 @@ doctype html
 html
   head
     title Login Database
-    link(rel='shortcut icon', href='')
-    link(rel='stylesheet', href='/stylesheets/style.css')
-    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css')
+    link(rel='shortcut icon' href='')
+    link(rel='stylesheet' href='/stylesheets/style.css')
+    link(rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css')
     script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js')
     script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js')
 
@@ -14,18 +14,26 @@ html
         .navbar-header
           a.navbar-brand(href='#') Login Database
         ul.nav.navbar-nav
-          li(class=(title=='Members'?'active':''))
-            a(href='/') Members
+          //- li(class=(title=='Members'?'active':''))
+          //-   a(href='/') Members
+          //- if !person
+          //-  li(class=(title=='Register'?'active':''))
+          //-   a(href='/users/register') Register
+          //-  li(class=(title=='Login'?'active':''))
+          //-   a(href='/users/login') Login
+          if person && person.role == 'crud'
+            li(class= 'active')
+              a(href='/') Users
           if !person
-           li(class=(title=='Register'?'active':''))
-            a(href='/users/register') Register
-           li(class=(title=='Login'?'active':''))
-            a(href='/users/login') Login
+            li(class=(title=='Register' ? 'active' : ''))
+              a(href='/users/register') Register
+            li(class=(title=='Login' ? 'active' : ''))
+              a(href='/users/login') Login
         ul.nav.navbar-nav.navbar-right
           if person
             li
               span(style='color:white;font-size:1.3vw;padding-right:10px;') Hello #{person.name}, 
-               a(href='/users/logout') Logout
+                a(href='/users/logout') Logout
     .container
       !=messages()
     block content

@@ -5,7 +5,12 @@ perf.config();
 
 /* GET home page . */
 router.get('/',ensureAuthenticated, function(req, res, next) {
-  res.render('index', { title: 'Members'});
+  const userRole = req.user.role;
+  if (userRole === 'crud') {
+    res.redirect('/crud');
+  } else if (userRole === 'user') {
+    res.redirect('/users'); 
+  }
 });
 function ensureAuthenticated(req,res,next){
   if(req.isAuthenticated()){

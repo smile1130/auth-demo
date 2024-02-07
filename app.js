@@ -17,6 +17,7 @@ var db=mongoose.connection;
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var crudRouter = require('./routes/crud');
 
 var app = express();
 
@@ -73,6 +74,7 @@ next();
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/crud', crudRouter);
 app.listen(5001,function(){
   console.log('listening on port 5001');
 });

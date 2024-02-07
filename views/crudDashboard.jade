@@ -1,0 +1,129 @@
+extends layout
+
+block content
+    h1 Manage Users
+    p Here you can manage Users
+
+    table.table.table-bordered.table-striped
+        thead
+            tr
+                th Name
+                th Email
+                th Profile Image
+                th Username
+                th Contact
+                th Actions
+
+        tbody
+            each user in users
+                tr(data-user-id= user._id.toString())
+                    td.editable-cell(name='name') #{user.name}
+                    td.editable-cell(name='email') #{user.email}
+                    td.editable-cell(name='profileimage') #{user.profileimage}
+                    td.editable-cell(name='uname') #{user.uname}
+                    td.editable-cell(name='contact') #{user.contact}
+                    td
+                        a(href='javascript:void(0);' class='btn btn-primary edit-btn') Edit
+                        a(href='javascript:void(0);' class='btn btn-danger delete-btn') Delete
+
+    script(src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js")
+    script.
+        document.addEventListener('DOMContentLoaded', function () {
+            var editButtons = document.querySelectorAll('.edit-btn');
+            var deleteButtons = document.querySelectorAll('.delete-btn');
+
+            function toggleEditable(row) {
+                row.querySelectorAll('.editable-cell').forEach(function (cell) {
+                    cell.toggleAttribute('contenteditable');
+                    // Store the original value as a data attribute
+                    cell.dataset.originalValue = cell.textContent.trim();
+                });
+            }
+
+            function revertChanges(row) {
+                row.querySelectorAll('.editable-cell').forEach(function (cell) {
+                    // Revert to the original value
+                    cell.textContent = cell.dataset.originalValue;
+                });
+            }
+
+            function updateUser(userId, updatedUser) {
+                // Make an API call to update user
+                axios.put(`crud/update/${userId}`, updatedUser, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                    .then(response => {
+                        console.log(response.data);
+                        // Handle success or show a message
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        // Handle error or show an error message
+                    });
+            }
+
+            function deleteUser(userId) {
+                // Make an API call to delete user
+                axios.delete(`crud/delete/${userId}`)
+                    .then(response => {
+                        console.log(response.data);
+                        // Handle success or show a message
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        // Handle error or show an error message
+                    });
+            }
+
+            editButtons.forEach(function (button, index) {
+                button.addEventListener('click', function () {
+                    var row = button.closest('tr');
+                    toggleEditable(row);
+
+                    if (button.textContent === 'Submit') {
+                        var userId = row.dataset.userId;
+                        var updatedUser = {
+                            name: row.querySelector('.editable-cell[name="name"]').textContent.trim(),
+                            email: row.querySelector('.editable-cell[name="email"]').textContent.trim(),
+                            profileimage: row.querySelector('.editable-cell[name="profileimage"]').textContent.trim(),
+                            uname: row.querySelector('.editable-cell[name="uname"]').textContent.trim(),
+                            contact: row.querySelector('.editable-cell[name="contact"]').textContent.trim(),
+                        };
+                        updateUser(userId, updatedUser);
+                    }
+
+                    // Replace edit button with submit button
+                    button.textContent = button.textContent === 'Edit' ? 'Submit' : 'Edit';
+
+                    // Replace delete button with cancel button
+                    var deleteButton = row.querySelector('.delete-btn');
+                    deleteButton.textContent = deleteButton.textContent === 'Delete' ? 'Cancel' : 'Delete';
+                });
+            });
+
+            deleteButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    var row = button.closest('tr');
+
+                    // If cancel button is clicked, revert changes
+                    if (button.textContent === 'Cancel') {
+                        revertChanges(row);
+                        toggleEditable(row);
+
+                        // Revert to edit button
+                        var editButton = row.querySelector('.edit-btn');
+                        editButton.textContent = 'Edit';
+
+                        // Revert to delete button
+                        button.textContent = 'Delete';
+                    } else {
+                        // If delete button is clicked, remove the row and delete user
+                        var userId = row.dataset.userId;
+                        deleteUser(userId);
+                        row.remove();
+                    }
+                });
+            });
+        });
